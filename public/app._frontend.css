@@ -1,0 +1,43 @@
+body {
+  background-image: url("https://i.ibb.co/T25h7G9/3302201.jpg");
+  color: white;
+}
+
+#logo {
+  margin-left: 0.5%;
+}
+
+#navbtns {
+  margin-right: 1%;
+}
+
+#app-description {
+  text-align: center;
+  margin-top: 10%;
+}
+
+#course-preview {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#homepage-btn {
+  text-align: center;
+  margin-bottom: 2vh;
+  margin-top: 2vh;
+}
+
+#signup-login {
+  width: 30%;
+  margin: 10% auto 0 auto;
+  text-align: center;
+}
+
+#authUser {
+  text-align: center;
+}
+
+#authAdmin {
+  text-align: center;
+}
