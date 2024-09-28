@@ -98,19 +98,23 @@ function UserLoginFormComponent() {
 
   emailEl.setAttribute("type", "text");
   emailEl.setAttribute("placeholder", "Enter your email...");
+  emailEl.classList.add("form-control");
   emailEl.setAttribute("id", "useremail");
   emailEl.style.marginRight = "1vw";
   passwordEl.setAttribute("type", "text");
   passwordEl.setAttribute("placeholder", "Enter your password...");
+  passwordEl.classList.add("form-control");
   passwordEl.setAttribute("id", "userpassword");
   passwordEl.style.marginRight = "1vw";
   firstNameEl.setAttribute("type", "text");
   firstNameEl.setAttribute("placeholder", "Enter your First name...");
+  firstNameEl.classList.add("form-control");
   firstNameEl.setAttribute("id", "userfirstname");
   firstNameEl.style.marginRight = "1vw";
   firstNameEl.style.marginTop = "1vh";
   lastNameEl.setAttribute("type", "text");
   lastNameEl.setAttribute("placeholder", "Enter your Last name...");
+  lastNameEl.classList.add("form-control");
   lastNameEl.setAttribute("id", "userlastname");
   lastNameEl.style.marginRight = "1vw";
   lastNameEl.style.marginRight = "1vw";
@@ -124,10 +128,12 @@ function UserLoginFormComponent() {
   signupEl.style.marginBottom = "1vh";
   email2El.setAttribute("type", "text");
   email2El.setAttribute("placeholder", "Enter your email...");
+  email2El.classList.add("form-control");
   email2El.setAttribute("id", "user2email");
   email2El.style.marginRight = "1vw";
   password2El.setAttribute("type", "text");
   password2El.setAttribute("placeholder", "Enter your password...");
+  password2El.classList.add("form-control");
   password2El.setAttribute("id", "user2password");
   password2El.style.marginRight = "1vw";
   loginEl.setAttribute("type", "button");
@@ -231,6 +237,7 @@ function UserPurchasedCourseComponent(data) {
   document.getElementById("authUser").append(purchasedCourses);
   render(data, "purchases");
   purchasedCourses.style.display = "flex";
+  purchasedCourses.style.flexWrap = "wrap";
   purchasedCourses.style.justifyContent = "center";
 }
 
@@ -273,11 +280,14 @@ function UserPurchaseComponent() {
   const purchaseCourse = document.createElement("div");
   purchaseCourse.style.borderTop = "1px solid grey";
   const header = document.createElement("h5");
+  const childDiv = document.createElement("div");
   header.innerHTML = "Purchase a New Course:";
   const courseId = document.createElement("input");
   courseId.setAttribute("type", "text");
   courseId.setAttribute("placeholder", "Enter Course Id...");
+  courseId.classList.add("form-control");
   courseId.setAttribute("id", "courseId");
+  courseId.style.width = "20%";
   const purchasebtn = document.createElement("button");
   purchasebtn.setAttribute("type", "button");
   purchasebtn.setAttribute("onclick", "purchase()");
@@ -285,8 +295,12 @@ function UserPurchaseComponent() {
   purchasebtn.classList.add("btn-primary");
   purchasebtn.innerHTML = "Purchase Course";
   purchasebtn.style.marginLeft = "1vw";
-  purchaseCourse.append(header, courseId, purchasebtn);
+  childDiv.append(header, courseId, purchasebtn);
+  purchaseCourse.appendChild(childDiv);
   document.getElementById("authUser").appendChild(purchaseCourse);
+  childDiv.style.display = "flex";
+  childDiv.style.justifyContent = "center";
+  childDiv.style.marginTop = "1vh";
 }
 
 async function LoginUser() {
@@ -312,7 +326,7 @@ async function LoginUser() {
   }
 
   document.getElementById("signup-login").style.display = "none";
-
+  document.getElementById("navbar").style.display = "none";
   localStorage.setItem("token", response.data.token);
   alert(response.data.message);
 
@@ -346,11 +360,17 @@ function AdminLoginFormComponent() {
   const brEL = document.createElement("br");
 
   const emailEl = document.createElement("input");
+  emailEl.classList.add("form-control");
   const passwordEl = document.createElement("input");
+  passwordEl.classList.add("form-control");
   const email2El = document.createElement("input");
+  email2El.classList.add("form-control");
   const password2El = document.createElement("input");
+  password2El.classList.add("form-control");
   const firstNameEl = document.createElement("input");
+  firstNameEl.classList.add("form-control");
   const lastNameEl = document.createElement("input");
+  lastNameEl.classList.add("form-control");
   const signupEl = document.createElement("button");
   const loginEl = document.createElement("button");
 
@@ -489,6 +509,7 @@ function AdminCreatedCourseComponent(data) {
   document.getElementById("authAdmin").append(createdCourses);
   render(data, "courses");
   createdCourses.style.display = "flex";
+  createdCourses.style.flexWrap = "wrap";
   createdCourses.style.justifyContent = "center";
 }
 
@@ -633,10 +654,13 @@ function AdminCreateUpdateDeleteComponent() {
   parentEl.style.borderTop = "1px solid grey";
   const createEl = document.createElement("div");
   createEl.style.width = "30%";
+  createEl.style.padding = "1vw 1vh";
   const updateEl = document.createElement("div");
   updateEl.style.width = "30%";
+  updateEl.style.padding = "1vw 1vh";
   const deleteEl = document.createElement("div");
   deleteEl.style.width = "30%";
+  deleteEl.style.padding = "1vw 1vh";
 
   const brEl = document.createElement("br");
   //create-course
@@ -645,18 +669,22 @@ function AdminCreateUpdateDeleteComponent() {
   const titleEl = document.createElement("input");
   titleEl.setAttribute("type", "text");
   titleEl.setAttribute("placeholder", "Title of the course...");
+  titleEl.classList.add("form-control");
   titleEl.setAttribute("id", "createtitle");
   const descriptionEl = document.createElement("input");
   descriptionEl.setAttribute("type", "text");
   descriptionEl.setAttribute("placeholder", "Description of the course...");
+  descriptionEl.classList.add("form-control");
   descriptionEl.setAttribute("id", "createdescription");
   const priceEl = document.createElement("input");
   priceEl.setAttribute("type", "number");
   priceEl.setAttribute("placeholder", "Price of the course...");
+  priceEl.classList.add("form-control");
   priceEl.setAttribute("id", "createprice");
   const imageEl = document.createElement("input");
   imageEl.setAttribute("type", "text");
   imageEl.setAttribute("placeholder", "Image for the course...");
+  imageEl.classList.add("form-control");
   imageEl.setAttribute("id", "createimage");
   const createbtn = document.createElement("button");
   createbtn.setAttribute("type", "button");
@@ -679,10 +707,12 @@ function AdminCreateUpdateDeleteComponent() {
   const updateCourse = document.createElement("input");
   updateCourse.setAttribute("type", "text");
   updateCourse.setAttribute("placeholder", "CourseId of the Course...");
+  updateCourse.classList.add("form-control");
   updateCourse.setAttribute("id", "updatecourse");
   const updatetitleEl = document.createElement("input");
   updatetitleEl.setAttribute("type", "text");
   updatetitleEl.setAttribute("placeholder", "Title of the course...");
+  updatetitleEl.classList.add("form-control");
   updatetitleEl.setAttribute("id", "updatetitle");
   const updatedescriptionEl = document.createElement("input");
   updatedescriptionEl.setAttribute("type", "text");
@@ -690,14 +720,17 @@ function AdminCreateUpdateDeleteComponent() {
     "placeholder",
     "Description of the course..."
   );
+  updatedescriptionEl.classList.add("form-control");
   updatedescriptionEl.setAttribute("id", "updatedescription");
   const updatepriceEl = document.createElement("input");
   updatepriceEl.setAttribute("type", "text");
   updatepriceEl.setAttribute("placeholder", "Price of the course...");
+  updatepriceEl.classList.add("form-control");
   updatepriceEl.setAttribute("id", "updateprice");
   const updateimageEl = document.createElement("input");
   updateimageEl.setAttribute("type", "text");
   updateimageEl.setAttribute("placeholder", "Image for the course...");
+  updateimageEl.classList.add("form-control");
   updateimageEl.setAttribute("id", "updateimage");
   const updatebtn = document.createElement("button");
   updatebtn.setAttribute("type", "button");
@@ -722,6 +755,7 @@ function AdminCreateUpdateDeleteComponent() {
   const courseId = document.createElement("input");
   courseId.setAttribute("type", "text");
   courseId.setAttribute("placeholder", "Enter Course Id....");
+  courseId.classList.add("form-control");
   courseId.setAttribute("id", "deletecourse");
   const deletebtn = document.createElement("button");
   deletebtn.setAttribute("type", "button");
@@ -737,6 +771,7 @@ function AdminCreateUpdateDeleteComponent() {
   parentEl.append(createEl, updateEl, deleteEl);
   parentEl.style.display = "flex";
   parentEl.style.justifyContent = "center";
+  parentEl.style.flexWrap = "wrap";
   document.getElementById("authAdmin").appendChild(parentEl);
 }
 
@@ -766,6 +801,7 @@ async function LoginAdmin() {
   }
 
   document.getElementById("signup-login").style.display = "none";
+  document.getElementById("navbar").style.display = "none";
 
   localStorage.setItem("token", response.data.token);
   alert(response.data.message);
