@@ -2,8 +2,11 @@
 function courseComponent(data) {
   // Create 3 elements: parent div, image, and child div
   const parentDiv = document.createElement("div");
+  parentDiv.style.width = "20%";
+  parentDiv.style.height = "60vh";
   const imageEl = document.createElement("img");
   const childDiv = document.createElement("div");
+  childDiv.style.fontSize = "1.5vh";
 
   //Create children of child div elements
   const pEl = document.createElement("p");
@@ -27,11 +30,8 @@ function courseComponent(data) {
 
   pEl.innerHTML = `<b>${data.title}</b>`;
   p1El.innerHTML = data.description;
-  p1El.classList.add("lead");
   p2El.innerHTML = `<b>Price:</b> Rs.` + data.price;
-  p2El.classList.add("lead");
   p3El.innerHTML = `<b>Course Creator:</b>` + data.creatorName;
-  p3El.classList.add("lead");
   p4El.innerHTML = `<b>Course ID:</b>` + data._id;
 
   childDiv.classList.add("card-body");
@@ -75,19 +75,28 @@ async function previewCourses() {
 function UserLoginFormComponent() {
   const parentEl = document.createElement("div");
   parentEl.style.backgroundColor = "transparent";
+  parentEl.style.border = "none";
   const child1El = document.createElement("div");
   child1El.style.backgroundColor = "transparent";
+  child1El.style.border = "none";
   const child2El = document.createElement("div");
   child2El.style.backgroundColor = "transparent";
+  child2El.style.border = "none";
 
   const brEL = document.createElement("br");
 
   const emailEl = document.createElement("input");
+  emailEl.style.marginBottom = "0.5vh";
   const passwordEl = document.createElement("input");
+  passwordEl.style.marginBottom = "0.5vh";
   const email2El = document.createElement("input");
+  email2El.style.marginBottom = "0.5vh";
   const password2El = document.createElement("input");
+  password2El.style.marginBottom = "0.5vh";
   const firstNameEl = document.createElement("input");
+  firstNameEl.style.marginBottom = "0.5vh";
   const lastNameEl = document.createElement("input");
+  lastNameEl.style.marginBottom = "0.5vh";
   const signupEl = document.createElement("button");
   const loginEl = document.createElement("button");
 
@@ -353,24 +362,32 @@ async function LoginUser() {
 function AdminLoginFormComponent() {
   const parentEl = document.createElement("div");
   parentEl.style.backgroundColor = "transparent";
+  parentEl.style.border = "none";
   const child1El = document.createElement("div");
   child1El.style.backgroundColor = "transparent";
+  child1El.style.border = "none";
   const child2El = document.createElement("div");
   child2El.style.backgroundColor = "transparent";
+  child2El.style.border = "none";
   const brEL = document.createElement("br");
 
   const emailEl = document.createElement("input");
   emailEl.classList.add("form-control");
+  emailEl.style.marginBottom = "0.5vh";
   const passwordEl = document.createElement("input");
   passwordEl.classList.add("form-control");
   const email2El = document.createElement("input");
   email2El.classList.add("form-control");
+  email2El.style.marginBottom = "0.5vh";
   const password2El = document.createElement("input");
   password2El.classList.add("form-control");
+  password2El.style.marginBottom = "0.5vh";
   const firstNameEl = document.createElement("input");
   firstNameEl.classList.add("form-control");
+  firstNameEl.style.marginBottom = "0.5vh";
   const lastNameEl = document.createElement("input");
   lastNameEl.classList.add("form-control");
+  lastNameEl.style.marginBottom = "0.5vh";
   const signupEl = document.createElement("button");
   const loginEl = document.createElement("button");
 
