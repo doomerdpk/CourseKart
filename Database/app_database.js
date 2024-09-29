@@ -30,14 +30,20 @@ const purchaseSchema = new Schema({
   courseId: ObjectId,
 });
 
+const logSchema = new Schema({
+  requestLog: String,
+});
+
 const userModel = mongoose.model("users", userSchema);
 const adminModel = mongoose.model("admins", adminSchema);
 const courseModel = mongoose.model("courses", courseSchema);
 const purchaseModel = mongoose.model("purchases", purchaseSchema);
+const logModel = mongoose.model("logs", logSchema);
 
 module.exports = {
   userModel,
   adminModel,
   courseModel,
   purchaseModel,
+  logModel,
 };
