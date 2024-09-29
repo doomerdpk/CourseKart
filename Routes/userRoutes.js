@@ -9,8 +9,9 @@ const { z } = require("zod");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { UserAuth } = require("../Authentication/Authentication");
+const UserRateLimiter = require("../middlewares/ratelimiters/UserRateLimiter");
 
-router.post("/signup", async function (req, res) {
+router.post("/signup", UserRateLimiter, async function (req, res) {
   const requiredSchema = z.object({
     email: z
       .string()
@@ -68,7 +69,7 @@ router.post("/signup", async function (req, res) {
   }
 });
 
-router.post("/login", async function (req, res) {
+router.post("/login", UserRateLimiter, async function (req, res) {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -110,71 +111,82 @@ router.post("/login", async function (req, res) {
   }
 });
 
-router.post("/purchase-course", UserAuth, async function (req, res) {
-  const requiredSchema = z.object({
-    courseId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Course ID!"),
-  });
-
-  const parsedWithSuccess = requiredSchema.safeParse(req.body);
-
-  if (!parsedWithSuccess.success) {
-    const errorMessages = parsedWithSuccess.error.issues.map(
-      (issue) => issue.message
-    );
-    res.json({
-      error: errorMessages,
+router.post(
+  "/purchase-course",
+  UserAuth,
+  UserRateLimiter,
+  async function (req, res) {
+    const requiredSchema = z.object({
+      courseId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Course ID!"),
     });
-    return;
-  }
-  const { courseId } = req.body;
 
-  if (!courseId) {
-    res.json({
-      error: "Please provide the course id of the course you want to purchase!",
+    const parsedWithSuccess = requiredSchema.safeParse(req.body);
+
+    if (!parsedWithSuccess.success) {
+      const errorMessages = parsedWithSuccess.error.issues.map(
+        (issue) => issue.message
+      );
+      res.json({
+        error: errorMessages,
+      });
+      return;
+    }
+    const { courseId } = req.body;
+
+    if (!courseId) {
+      res.json({
+        error:
+          "Please provide the course id of the course you want to purchase!",
+      });
+      return;
+    }
+
+    const foundCourse = await courseModel.findOne({
+      _id: courseId,
     });
-    return;
+
+    if (foundCourse) {
+      await purchaseModel.create({
+        userId: req.userId,
+        courseId: req.body.courseId,
+      });
+
+      res.json({
+        message: "You have successfully purchased this course!",
+      });
+    } else {
+      res.json({
+        error: "Course with provided course id doesn't exist!",
+      });
+    }
   }
+);
 
-  const foundCourse = await courseModel.findOne({
-    _id: courseId,
-  });
-
-  if (foundCourse) {
-    await purchaseModel.create({
+router.get(
+  "/my-purchased-courses",
+  UserAuth,
+  UserRateLimiter,
+  async function (req, res) {
+    const all_purchases = await purchaseModel.find({
       userId: req.userId,
-      courseId: req.body.courseId,
     });
 
-    res.json({
-      message: "You have successfully purchased this course!",
-    });
-  } else {
-    res.json({
-      error: "Course with provided course id doesn't exist!",
-    });
+    if (all_purchases.length == 0) {
+      res.json({
+        empty_message: "You haven't purchased any course yet!",
+      });
+      return;
+    } else {
+      const courseIds = all_purchases.map(
+        (all_purchase) => all_purchase.courseId
+      );
+
+      const Courses = await courseModel.find({ _id: { $in: courseIds } });
+      res.json({
+        message: Courses,
+      });
+    }
   }
-});
-
-router.get("/my-purchased-courses", UserAuth, async function (req, res) {
-  const all_purchases = await purchaseModel.find({
-    userId: req.userId,
-  });
-
-  if (all_purchases.length == 0) {
-    res.json({
-      empty_message: "You haven't purchased any course yet!",
-    });
-    return;
-  } else {
-    const courseIds = all_purchases.map(
-      (all_purchase) => all_purchase.courseId
-    );
-
-    const Courses = await courseModel.find({ _id: { $in: courseIds } });
-    res.json({
-      message: Courses,
-    });
-  }
-});
+);
 
 module.exports = router;

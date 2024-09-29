@@ -7,7 +7,7 @@ const logRequests = require("./middlewares/requestlogs");
 
 app.use(cors());
 app.use(express.json());
-app.use(logRequests);
+//app.use(logRequests);
 
 const userRoutes = require("./Routes/userRoutes");
 const adminRoutes = require("./Routes/adminRoutes");
