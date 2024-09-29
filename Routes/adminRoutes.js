@@ -112,8 +112,14 @@ router.post(
   AdminRateLimiter,
   async function (req, res) {
     const requiredSchema = z.object({
-      title: z.string().min(1, "title of a course cannot be empty!"),
-      description: z.string().min(1, "description cannnot be empty!"),
+      title: z
+        .string()
+        .min(1, "title of a course cannot be empty!")
+        .max(50, "title can have maximum 50 characters!"),
+      description: z
+        .string()
+        .min(1, "description cannnot be empty!")
+        .max(200, "description can have maximum 200 characters!"),
       price: z.number().min(1, "Price of a Course Cannot be empty!"),
       imageUrl: z.string().url().min(1, "Image of the course cannot be empty"),
     });
@@ -167,10 +173,12 @@ router.put(
       courseId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Course ID!"),
       updatedtitle: z
         .string()
-        .min(1, "Please provided the updated title of the course!"),
+        .min(1, "Please provided the updated title of the course!")
+        .max(50, "title can have maximum 50 characters!"),
       updateddescription: z
         .string()
-        .min(1, "Please provided the updated description of the course!"),
+        .min(1, "Please provided the updated description of the course!")
+        .max(200, "description can have maximum 200 characters!"),
       updatedprice: z
         .number()
         .min(1, "Please provided the updated price of the course!"),
