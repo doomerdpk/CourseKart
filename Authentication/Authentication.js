@@ -1,36 +1,30 @@
 const jwt = require("jsonwebtoken");
 
-function UserAuth(req, res, next) {
-  const token = req.headers.token;
+function authenticate(secret) {
+  return function (req, res, next) {
+    const token = req.headers.token; // Get token from Authorization header
 
-  const decodedData = jwt.verify(token, process.env.USER_JWT_SECRET);
+    if (!token) {
+      return res.json({ error: "JWT token is required!" });
+    }
 
-  if (decodedData) {
-    req.userId = decodedData.userId;
-    next();
-  } else {
-    res.status(401).json({
-      error: "Incorrect Credientials!",
-    });
-  }
+    const decodedData = jwt.verify(token, secret);
+    if (decodedData) {
+      req.userId = decodedData.userId;
+      next();
+    }
+  };
 }
 
-function adminAuth(req, res, next) {
-  const token = req.headers.token;
-
-  const decodedData = jwt.verify(token, process.env.ADMIN_JWT_SECRET);
-
-  if (decodedData) {
-    req.userId = decodedData.userId;
-    next();
-  } else {
-    res.status(401).json({
-      error: "Incorrect Credientials!",
-    });
-  }
+if (!process.env.USER_JWT_SECRET || !process.env.ADMIN_JWT_SECRET) {
+  console.error("JWT secrets are missing in environment variables.");
+  throw new Error("JWT secrets are required");
 }
+
+const UserAuth = authenticate(process.env.USER_JWT_SECRET);
+const AdminAuth = authenticate(process.env.ADMIN_JWT_SECRET);
 
 module.exports = {
   UserAuth,
-  adminAuth,
+  AdminAuth,
 };

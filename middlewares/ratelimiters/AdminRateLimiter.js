@@ -2,27 +2,31 @@ let requestCounts = {};
 
 function AdminRateLimiter(req, res, next) {
   const now = Date.now();
-  const windowTime = 60 * 1000;
+  const windowTime = 60 * 1000; // 1 minute
   const requestLimit = 5;
+  const userId = req.userId || req.ip;
 
-  const userIP = req.ip;
-
-  if (!requestCounts[userIP]) {
-    requestCounts[userIP] = [];
+  if (!requestCounts[userId]) {
+    requestCounts[userId] = { count: 0, lastReset: now };
   }
-  requestCounts[userIP] = requestCounts[userIP].filter(
-    (timestamp) => now - timestamp < windowTime
-  );
 
-  if (requestCounts[userIP].length >= requestLimit) {
+  if (now - requestCounts[userId].lastReset > windowTime) {
+    // Reset the count if the window time has passed
+    requestCounts[userId].count = 0;
+    requestCounts[userId].lastReset = now;
+  }
+
+  requestCounts[userId].count++;
+
+  if (requestCounts[userId].length >= requestLimit) {
     res.json({
-      error: "Too many Requests!",
+      error: `Too many requests. Please try again after ${Math.ceil(
+        windowTime / 1000
+      )}`,
     });
     return;
-  } else {
-    requestCounts[userIP].push(now);
-    next();
   }
+  next();
 }
 
 module.exports = AdminRateLimiter;

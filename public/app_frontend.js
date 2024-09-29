@@ -64,11 +64,17 @@ function render(data, id) {
 
 async function previewCourses() {
   document.getElementById("app-description").style.display = "none";
-  const courses = await axios.get(
-    "http://localhost:3000/api/v1/course/preview"
-  );
-  document.getElementById("homepage-btn").style.display = "block";
-  render(courses.data, "course-preview");
+  try {
+    const courses = await axios.get(
+      "http://localhost:3000/api/v1/course/preview"
+    );
+    document.getElementById("homepage-btn").style.display = "block";
+    render(courses.data, "course-preview");
+  } catch (e) {
+    console.error(e);
+    alert("Error in Fetching Courses!");
+    return;
+  }
 }
 
 //Normal User Section
@@ -181,27 +187,32 @@ async function UserSignUp() {
   const password = document.getElementById("userpassword").value;
   const firstName = document.getElementById("userfirstname").value;
   const lastName = document.getElementById("userlastname").value;
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/user/signup",
+      {
+        email,
+        password,
+        firstName,
+        lastName,
+      }
+    );
 
-  const response = await axios.post(
-    "http://localhost:3000/api/v1/user/signup",
-    {
-      email,
-      password,
-      firstName,
-      lastName,
+    if (response.data.error) {
+      alert(response.data.error);
+      return;
     }
-  );
 
-  if (response.data.error) {
-    alert(response.data.error);
+    alert(response.data.message);
+    document.getElementById("useremail").value = "";
+    document.getElementById("userpassword").value = "";
+    document.getElementById("userfirstname").value = "";
+    document.getElementById("userlastname").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Error Creating User!");
     return;
   }
-
-  alert(response.data.message);
-  document.getElementById("useremail").value = "";
-  document.getElementById("userpassword").value = "";
-  document.getElementById("userfirstname").value = "";
-  document.getElementById("userlastname").value = "";
 }
 
 function UserLogin() {
@@ -253,36 +264,48 @@ function UserPurchasedCourseComponent(data) {
 async function purchase() {
   const courseId = document.getElementById("courseId").value;
   const token = localStorage.getItem("token");
-  const purchaseCourse = await axios.post(
-    "http://localhost:3000/api/v1/user/purchase-course",
-    {
-      courseId,
-    },
-    {
-      headers: {
-        token,
+  try {
+    const purchaseCourse = await axios.post(
+      "http://localhost:3000/api/v1/user/purchase-course",
+      {
+        courseId,
       },
-    }
-  );
+      {
+        headers: {
+          token,
+        },
+      }
+    );
 
-  if (purchaseCourse.data.error) {
-    alert(purchaseCourse.data.error);
+    if (purchaseCourse.data.error) {
+      alert(purchaseCourse.data.error);
+      return;
+    }
+
+    alert(purchaseCourse.data.message);
+    document.getElementById("courseId").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Error Purchasing this Course!");
     return;
   }
 
-  alert(purchaseCourse.data.message);
-  document.getElementById("courseId").value = "";
+  try {
+    const purchases = await axios.get(
+      "http://localhost:3000/api/v1/user/my-purchased-courses",
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
 
-  const purchases = await axios.get(
-    "http://localhost:3000/api/v1/user/my-purchased-courses",
-    {
-      headers: {
-        token: token,
-      },
-    }
-  );
-
-  UserPurchasedCourseComponent(purchases.data);
+    UserPurchasedCourseComponent(purchases.data);
+  } catch (e) {
+    console.error(e);
+    alert("Error in Fetching Purchased Courses!");
+    return;
+  }
 }
 
 function UserPurchaseComponent() {
@@ -322,37 +345,51 @@ async function LoginUser() {
 
   const email = document.getElementById("user2email").value;
   const password = document.getElementById("user2password").value;
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/user/login",
+      {
+        email,
+        password,
+      }
+    );
+    if (response.data.error) {
+      alert(response.data.error);
+      document.getElementById("user2email").value = "";
+      document.getElementById("user2password").value = "";
+      return;
+    }
 
-  const response = await axios.post("http://localhost:3000/api/v1/user/login", {
-    email,
-    password,
-  });
-  if (response.data.error) {
-    alert(response.data.error);
-    document.getElementById("user2email").value = "";
-    document.getElementById("user2password").value = "";
+    document.getElementById("signup-login").style.display = "none";
+    document.getElementById("navbar").style.display = "none";
+    localStorage.setItem("token", response.data.token);
+    alert(response.data.message);
+
+    UserDetailsComponent(response.data.userName);
+  } catch (e) {
+    console.error(e);
+    alert("Error Logging in!");
     return;
   }
 
-  document.getElementById("signup-login").style.display = "none";
-  document.getElementById("navbar").style.display = "none";
-  localStorage.setItem("token", response.data.token);
-  alert(response.data.message);
-
-  UserDetailsComponent(response.data.userName);
-
   const token = localStorage.getItem("token");
 
-  const purchases = await axios.get(
-    "http://localhost:3000/api/v1/user/my-purchased-courses",
-    {
-      headers: {
-        token: token,
-      },
-    }
-  );
+  try {
+    const purchases = await axios.get(
+      "http://localhost:3000/api/v1/user/my-purchased-courses",
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
 
-  UserPurchasedCourseComponent(purchases.data);
+    UserPurchasedCourseComponent(purchases.data);
+  } catch (e) {
+    console.error(e);
+    alert("Error Fetching Purchased Courses!");
+    return;
+  }
 
   UserPurchaseComponent();
 }
@@ -466,27 +503,32 @@ async function AdminSignUp() {
   const password = document.getElementById("adminpassword").value;
   const firstName = document.getElementById("adminfirstname").value;
   const lastName = document.getElementById("adminlastname").value;
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/admin/signup",
+      {
+        email,
+        password,
+        firstName,
+        lastName,
+      }
+    );
 
-  const response = await axios.post(
-    "http://localhost:3000/api/v1/admin/signup",
-    {
-      email,
-      password,
-      firstName,
-      lastName,
+    if (response.data.error) {
+      alert(response.data.error);
+      return;
     }
-  );
 
-  if (response.data.error) {
-    alert(response.data.error);
+    alert(response.data.message);
+    document.getElementById("adminemail").value = "";
+    document.getElementById("adminpassword").value = "";
+    document.getElementById("adminfirstname").value = "";
+    document.getElementById("adminlastname").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Error Creating an Admin!");
     return;
   }
-
-  alert(response.data.message);
-  document.getElementById("adminemail").value = "";
-  document.getElementById("adminpassword").value = "";
-  document.getElementById("adminfirstname").value = "";
-  document.getElementById("adminlastname").value = "";
 }
 
 function AdminLogin() {
@@ -537,45 +579,57 @@ async function createCourse() {
   const imageUrl = document.getElementById("createimage").value;
   const token = localStorage.getItem("token");
 
-  const response = await axios.post(
-    "http://localhost:3000/api/v1/admin/create-course",
-    {
-      title,
-      description,
-      price,
-      imageUrl,
-    },
-    {
-      headers: {
-        token,
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/admin/create-course",
+      {
+        title,
+        description,
+        price,
+        imageUrl,
       },
-    }
-  );
+      {
+        headers: {
+          token,
+        },
+      }
+    );
 
-  if (response.data.error) {
-    alert(response.data.error);
+    if (response.data.error) {
+      alert(response.data.error);
+      document.getElementById("createtitle").value = "";
+      document.getElementById("createdescription").value = "";
+      document.getElementById("createprice").value = "";
+      document.getElementById("createimage").value = "";
+      return;
+    }
+
+    alert(response.data.message);
     document.getElementById("createtitle").value = "";
     document.getElementById("createdescription").value = "";
     document.getElementById("createprice").value = "";
     document.getElementById("createimage").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Error Creating this Course!");
     return;
   }
 
-  alert(response.data.message);
-  document.getElementById("createtitle").value = "";
-  document.getElementById("createdescription").value = "";
-  document.getElementById("createprice").value = "";
-  document.getElementById("createimage").value = "";
-
-  const courses = await axios.get(
-    "http://localhost:3000/api/v1/admin/my-created-courses",
-    {
-      headers: {
-        token: token,
-      },
-    }
-  );
-  AdminCreatedCourseComponent(courses.data);
+  try {
+    const courses = await axios.get(
+      "http://localhost:3000/api/v1/admin/my-created-courses",
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    AdminCreatedCourseComponent(courses.data);
+  } catch (e) {
+    console.error(e);
+    alert("Error in Fetching Created Courses!");
+    return;
+  }
 }
 
 async function updateCourse() {
@@ -585,84 +639,106 @@ async function updateCourse() {
   const updatedprice = +document.getElementById("updateprice").value;
   const updatedimageUrl = document.getElementById("updateimage").value;
   const token = localStorage.getItem("token");
-
-  const response = await axios.put(
-    "http://localhost:3000/api/v1/admin/update-course",
-    {
-      courseId,
-      updatedtitle,
-      updateddescription,
-      updatedprice,
-      updatedimageUrl,
-    },
-    {
-      headers: {
-        token,
+  try {
+    const response = await axios.put(
+      "http://localhost:3000/api/v1/admin/update-course",
+      {
+        courseId,
+        updatedtitle,
+        updateddescription,
+        updatedprice,
+        updatedimageUrl,
       },
-    }
-  );
+      {
+        headers: {
+          token,
+        },
+      }
+    );
 
-  if (response.data.error) {
-    alert(response.data.error);
+    if (response.data.error) {
+      alert(response.data.error);
+      document.getElementById("updatecourse").value = "";
+      document.getElementById("updatetitle").value = "";
+      document.getElementById("updatedescription").value = "";
+      document.getElementById("updateprice").value = "";
+      document.getElementById("updateimage").value = "";
+      return;
+    }
+
+    alert(response.data.message);
     document.getElementById("updatecourse").value = "";
     document.getElementById("updatetitle").value = "";
     document.getElementById("updatedescription").value = "";
     document.getElementById("updateprice").value = "";
     document.getElementById("updateimage").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Error Updating this Course");
     return;
   }
 
-  alert(response.data.message);
-  document.getElementById("updatecourse").value = "";
-  document.getElementById("updatetitle").value = "";
-  document.getElementById("updatedescription").value = "";
-  document.getElementById("updateprice").value = "";
-  document.getElementById("updateimage").value = "";
-
-  const courses = await axios.get(
-    "http://localhost:3000/api/v1/admin/my-created-courses",
-    {
-      headers: {
-        token: token,
-      },
-    }
-  );
-  AdminCreatedCourseComponent(courses.data);
+  try {
+    const courses = await axios.get(
+      "http://localhost:3000/api/v1/admin/my-created-courses",
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    AdminCreatedCourseComponent(courses.data);
+  } catch (e) {
+    console.error(e);
+    alert("Error Fetching Created Courses!");
+    return;
+  }
 }
 
 async function deleteCourse() {
   const courseId = document.getElementById("deletecourse").value;
   const token = localStorage.getItem("token");
-  const response = await axios.delete(
-    "http://localhost:3000/api/v1/admin/delete-course",
-    {
-      headers: {
-        token,
-      },
-      data: {
-        courseId,
-      },
-    }
-  );
+  try {
+    const response = await axios.delete(
+      "http://localhost:3000/api/v1/admin/delete-course",
+      {
+        headers: {
+          token,
+        },
+        data: {
+          courseId,
+        },
+      }
+    );
 
-  if (response.data.error) {
-    alert(response.data.error);
+    if (response.data.error) {
+      alert(response.data.error);
+      document.getElementById("deletecourse").value = "";
+      return;
+    }
+
+    alert(response.data.message);
     document.getElementById("deletecourse").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Error in Deleting this course!");
     return;
   }
-
-  alert(response.data.message);
-  document.getElementById("deletecourse").value = "";
-
-  const courses = await axios.get(
-    "http://localhost:3000/api/v1/admin/my-created-courses",
-    {
-      headers: {
-        token: token,
-      },
-    }
-  );
-  AdminCreatedCourseComponent(courses.data);
+  try {
+    const courses = await axios.get(
+      "http://localhost:3000/api/v1/admin/my-created-courses",
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    AdminCreatedCourseComponent(courses.data);
+  } catch (e) {
+    console.error(e);
+    alert("Error in Fetching Created Courses!");
+    return;
+  }
 }
 
 function AdminCreateUpdateDeleteComponent() {
@@ -802,40 +878,51 @@ async function LoginAdmin() {
 
   const email = document.getElementById("admin2email").value;
   const password = document.getElementById("admin2password").value;
-
-  const response = await axios.post(
-    "http://localhost:3000/api/v1/admin/login",
-    {
-      email,
-      password,
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/admin/login",
+      {
+        email,
+        password,
+      }
+    );
+    if (response.data.error) {
+      alert(response.data.error);
+      document.getElementById("admin2email").value = "";
+      document.getElementById("admin2password").value = "";
+      return;
     }
-  );
-  if (response.data.error) {
-    alert(response.data.error);
-    document.getElementById("admin2email").value = "";
-    document.getElementById("admin2password").value = "";
+
+    document.getElementById("signup-login").style.display = "none";
+    document.getElementById("navbar").style.display = "none";
+
+    localStorage.setItem("token", response.data.token);
+    alert(response.data.message);
+
+    AdminDetailsComponent(response.data.userName);
+  } catch (e) {
+    console.error(e);
+    alert("Error logging in!");
     return;
   }
 
-  document.getElementById("signup-login").style.display = "none";
-  document.getElementById("navbar").style.display = "none";
-
-  localStorage.setItem("token", response.data.token);
-  alert(response.data.message);
-
-  AdminDetailsComponent(response.data.userName);
-
   const token = localStorage.getItem("token");
 
-  const courses = await axios.get(
-    "http://localhost:3000/api/v1/admin/my-created-courses",
-    {
-      headers: {
-        token: token,
-      },
-    }
-  );
-  AdminCreatedCourseComponent(courses.data);
+  try {
+    const courses = await axios.get(
+      "http://localhost:3000/api/v1/admin/my-created-courses",
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    AdminCreatedCourseComponent(courses.data);
+  } catch (e) {
+    console.error(e);
+    alert("Error in Fetching Created Courses!");
+    return;
+  }
 
   AdminCreateUpdateDeleteComponent();
 }

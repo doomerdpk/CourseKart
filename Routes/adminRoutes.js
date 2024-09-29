@@ -4,7 +4,7 @@ const router = express.Router();
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { adminAuth } = require("../Authentication/Authentication");
+const { AdminAuth } = require("../Authentication/Authentication");
 const AdminRateLimiter = require("../middlewares/ratelimiters/AdminRateLimiter");
 
 router.post("/signup", AdminRateLimiter, async function (req, res) {
@@ -47,6 +47,11 @@ router.post("/signup", AdminRateLimiter, async function (req, res) {
 
   const hashedPassword = await bcrypt.hash(password, 5);
 
+  const existingUser = await adminModel.findOne({ email });
+  if (existingUser) {
+    return res.json({ error: "Email already in use." });
+  }
+
   try {
     await adminModel.create({
       email,
@@ -59,8 +64,9 @@ router.post("/signup", AdminRateLimiter, async function (req, res) {
       message: "You are Successfully Signed Up!",
     });
   } catch (e) {
+    console.error(e);
     res.json({
-      error: "Email already present. Please Choose another email!",
+      error: "An Unexpected error Occured!",
     });
   }
 });
@@ -108,7 +114,7 @@ router.post("/login", AdminRateLimiter, async function (req, res) {
 
 router.post(
   "/create-course",
-  adminAuth,
+  AdminAuth,
   AdminRateLimiter,
   async function (req, res) {
     const requiredSchema = z.object({
@@ -157,6 +163,7 @@ router.post(
         message: `You have successfully created a course with title ${title}`,
       });
     } catch (e) {
+      console.error(e);
       res.json({
         error: "Error Creating Course",
       });
@@ -166,7 +173,7 @@ router.post(
 
 router.put(
   "/update-course",
-  adminAuth,
+  AdminAuth,
   AdminRateLimiter,
   async function (req, res) {
     const requiredSchema = z.object({
@@ -240,7 +247,7 @@ router.put(
 
 router.delete(
   "/delete-course",
-  adminAuth,
+  AdminAuth,
   AdminRateLimiter,
   async function (req, res) {
     const requiredSchema = z.object({
@@ -286,7 +293,7 @@ router.delete(
 
 router.get(
   "/my-created-courses",
-  adminAuth,
+  AdminAuth,
   AdminRateLimiter,
   async function (req, res) {
     const created_courses = await courseModel.find({

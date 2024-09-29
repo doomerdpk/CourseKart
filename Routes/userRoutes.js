@@ -50,6 +50,10 @@ router.post("/signup", UserRateLimiter, async function (req, res) {
   const { email, password, firstName, lastName } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 5);
+  const existingUser = await userModel.findOne({ email });
+  if (existingUser) {
+    return res.json({ error: "Email already in use." });
+  }
 
   try {
     await userModel.create({
@@ -63,8 +67,9 @@ router.post("/signup", UserRateLimiter, async function (req, res) {
       message: "You are Successfully Signed Up!",
     });
   } catch (e) {
+    console.error(e);
     res.json({
-      error: "Email already present. Please Choose another email!",
+      error: "An Unexpected error Occured!",
     });
   }
 });
@@ -132,14 +137,6 @@ router.post(
       return;
     }
     const { courseId } = req.body;
-
-    if (!courseId) {
-      res.json({
-        error:
-          "Please provide the course id of the course you want to purchase!",
-      });
-      return;
-    }
 
     const foundCourse = await courseModel.findOne({
       _id: courseId,

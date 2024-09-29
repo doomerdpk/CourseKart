@@ -2,26 +2,32 @@ let requestCounts = {};
 
 function CourseRateLimiter(req, res, next) {
   const now = Date.now();
-  const windowTime = 20 * 1000;
+  const windowTime = 20 * 1000; // 20 seconds
   const requestLimit = 5;
+  const userId = req.userId || req.ip;
 
-  const userIP = req.ip;
-
-  if (!requestCounts[userIP]) {
-    requestCounts[userIP] = [];
+  if (!requestCounts[userId]) {
+    requestCounts[userId] = { count: 0, lastReset: now };
   }
-  requestCounts[userIP] = requestCounts[userIP].filter(
-    (timestamp) => now - timestamp < windowTime
-  );
 
-  if (requestCounts[userIP].length >= requestLimit) {
-    res.json({
-      empty_message: "Too many requests",
+  if (now - requestCounts[userId].lastReset > windowTime) {
+    // Reset the count if the window time has passed
+    requestCounts[userId].count = 0;
+    requestCounts[userId].lastReset = now;
+  }
+
+  requestCounts[userId].count++;
+
+  if (requestCounts[userId].count > requestLimit) {
+    res.status(429).json({
+      error: `Too many requests. Please try again after ${Math.ceil(
+        windowTime / 1000
+      )}`,
     });
-  } else {
-    requestCounts[userIP].push(now);
-    next();
+    return;
   }
+
+  next();
 }
 
 module.exports = CourseRateLimiter;

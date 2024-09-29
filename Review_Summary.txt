@@ -1,0 +1,35 @@
+# app_backend.js
+- Logging exact error in database connection error.
+- Introduced graceful shutdown with signal handling.
+- Externalized port configuration to environment variables.
+- Enhanced security using helmet.(npm install helmer)
+- Validated database environment variable to catch missing configurations early.
+
+# /Authentication/Authentication.js
+- Token Presence Check: Ensure a token is present before verifying.
+- DRY Principle: Refactor repeated code into a generic authentication function.
+- Environment Variable Validation: Ensure JWT secrets are present before running the app.
+
+# /Database/app_database.js
+- Added timestamps for the creation and updation of records
+
+# /middlewares/requestlogs.js
+- Add try catch while logging to the database
+- Avoided blocking middleware execution with asynchronous logging
+- Changed the structure of the logs
+- Performed Data Sanitization
+
+# /middlewares - 3
+- Made User Message more clear.
+- Changed the structure of tracking requests from  timestamps to requestcounts.
+- Rate Limit by UserId and not User IP. User IP will be used when UserId is not present.
+
+# /Routes/adminRoutes
+- Added Existing User Validation during Signup
+- Better Error Handling Mechanism.
+
+# /Routes/userRoutes
+- Added Error Handling Mechanism
+
+# /public/app_frontend.js
+- Improvement Suggestions: https://chatgpt.com/share/66f973e3-a730-8000-ab86-4e10c0ba73ed
